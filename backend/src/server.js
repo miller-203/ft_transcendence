@@ -1,6 +1,6 @@
-import app from "./app.js";
+const app = require("./app");
 
-const PORT = process.env.PORT || 8000;
+const PORT = Number(process.env.PORT || 8000);
 
 // Start the backend server on port 3000 || 8000.
 app.listen(PORT, () => {
