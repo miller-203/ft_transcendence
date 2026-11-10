@@ -8,3 +8,25 @@ datasource db {
 }
 
 // Add application models here, then create a migration with `npm run prisma:migrate`.
+
+enum UserType {
+  STUDENT
+  PROFESSOR
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  password  String
+  type      UserType @default(STUDENT)
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
