@@ -4,7 +4,6 @@ import { validate } from "../middlewares/validate.middleware.js";
 import { registerSchema } from "../validators/auth.validator.js";
 
 const router = Router();
-
 router.post("/register", validate(registerSchema), register);
 
 export default router;
