@@ -1,37 +1,44 @@
-import bcrypt from "bcryptjs";
-import prisma from "../lib/prisma.js";
+const bcrypt = require("bcrypt");
+const { createUser, findUserByEmail, findUserById} = require("../repositories/users.repository.js");
 
-export async function registerUser(data) {
-  const existingUser = await prisma.user.findUnique({
-    where: {
-      email: data.email,
-    },
-  });
+async function registerUser(name, email, password) {
 
-  if (existingUser) {
-    const error = new Error("Email already registered");
-    error.statusCode = 409;
-    throw error;
-  }
+    const passwordHash = await bcrypt.hash(password, 12);
 
-  const hashedPassword = await bcrypt.hash(data.password, 12);
+    const user = await createUser(name, email, passwordHash);
 
-  const user = await prisma.user.create({
-    data: {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      password: hashedPassword,
-    },
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      email: true,
-      role: true,
-      createdAt: true,
-    },
-  });
-
-  return user;
+    return user;
 }
+
+async function loginUser(email, password) {
+
+    const user = await findUserByEmail(email);
+
+    if (!user)
+        return undefined;
+
+    const isValid = await bcrypt.compare(
+        password,
+        user.password_hash
+    );
+
+    if (!isValid)
+        return undefined;
+
+    return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+    };
+}
+
+async function getUserProfile(userId)
+{
+    const user = await findUserById(userId);
+
+    return user;
+}
+
+
+module.exports = { registerUser, loginUser, getUserProfile};

@@ -1,9 +1,19 @@
-import { Router } from "express";
-import { register } from "../controllers/auth.controller.js";
-import { validate } from "../middlewares/validate.middleware.js";
-import { registerSchema } from "../validators/auth.validator.js";
+const express = require("express");
+const authRouter = express.Router();
+const {
+    register,
+    login,
+    logout,
+    getCsrfToken
+} = require("../controllers/auth.controller");
+const { validateRegister } = require("../middlewares/validateRegistration");
+const {validateLogin} = require("../middlewares/validateLogin");
+const {loginLimiter} = require("../middlewares/loginLimiter");
+const {verifyCsrf} = require("../middlewares/verifyCsrf");
 
-const router = Router();
-router.post("/register", validate(registerSchema), register);
+authRouter.get("/csrf-token", getCsrfToken);
+authRouter.post("/register", verifyCsrf, validateRegister,register);
+authRouter.post("/login", loginLimiter, verifyCsrf, validateLogin,login);
+authRouter.post("/logout", verifyCsrf, logout);
 
-export default router;
+module.exports = authRouter;
