@@ -2,12 +2,12 @@ const { registerUser, loginUser, getUserProfile} = require("../services/auth.ser
 const { signToken } = require("../lib/jwt");
 
 async function register(req, res, next) {
-    const { name, email, password } = req.body ?? {};
+    const { firstName, lastName, email, password, type, role } = req.body ?? {};
 
     try {
-        const user = await registerUser(name, email, password);
+        const user = await registerUser(firstName, lastName, email, password, type, role);
 
-        return res.status(201).json(user);
+        return res.status(201).json({ user });
     }
     catch (error) {
         if (error.code === "P2002") {

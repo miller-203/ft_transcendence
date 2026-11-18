@@ -1,17 +1,16 @@
 const bcrypt = require("bcrypt");
 const { prisma } = require("../config/prisma");
 
-async function registerUser(name, email, password) {
+async function registerUser(firstName, lastName, email, password, type, role) {
 
     const passwordHash = await bcrypt.hash(password, 12);
 
-    const [firstName, ...lastNameParts] = name.trim().split(/\s+/);
     const user = await prisma.user.create({
-        data: { firstName, lastName: lastNameParts.join(" ") || firstName, email: email.toLowerCase(), password: passwordHash },
-        select: { id: true, firstName: true, lastName: true, email: true }
+        data: { firstName, lastName, email: email.toLowerCase(), password: passwordHash, type: type, role: role },
+        select: { id: true, firstName: true, lastName: true, email: true, type: true, role: true }
     });
 
-    return { id: user.id, name: `${user.firstName} ${user.lastName}`, email: user.email };
+    return { id: user.id, name: `${user.firstName} ${user.lastName}`, email: user.email, type: user.type, role: user.role };
 }
 
 async function loginUser(email, password) {
@@ -33,7 +32,8 @@ async function loginUser(email, password) {
         id: user.id,
         name: `${user.firstName} ${user.lastName}`,
         email: user.email,
-        role: user.role
+        role: user.role,
+        type: user.type
     };
 }
 

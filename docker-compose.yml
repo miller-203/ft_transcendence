@@ -25,6 +25,7 @@ services:
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+      - "5555:5555" 
     environment:
       PORT: 8000
       DATABASE_URL: postgresql://${POSTGRES_USER:-learnhub_user}:${POSTGRES_PASSWORD:-learnhub_dev_password}@postgres:5432/${POSTGRES_DB:-learnhub}?schema=public

@@ -46,11 +46,9 @@ app.get("/", (req, res) => {
 });
 
 // Connect authentication routes to URLs starting with /auth.
-app.use("/auth", authRouter);
 app.use("/api/auth", authRouter);
 
 // Connect user routes to URLs starting with /users.
-app.use("/users", usersRouter);
 app.use("/api/users", usersRouter);
 
 // Handle errors forwarded by routes and middleware.

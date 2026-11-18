@@ -6,7 +6,6 @@ const encodedHeader = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).
 function getSecret() {
     const secret = process.env.JWT_SECRET;
     if (secret && secret.length >= 32) return secret;
-    if (process.env.NODE_ENV !== "production") return "local-only-jwt-secret-change-before-deploy";
     throw new Error("JWT_SECRET must be set to at least 32 characters in production");
 }
 
