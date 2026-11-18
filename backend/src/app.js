@@ -1,6 +1,5 @@
 
-import express from "express";
-import authRoutes from "./routes/auth.routes.js";
+const express = require("express");
 
 // Create our Express application.
 const app = express();
@@ -8,11 +7,6 @@ const app = express();
 if (process.env.TRUST_PROXY === "1") {
     app.set("trust proxy", 1);
 }
-
-// Import express-session to manage user login sessions.
-const session = require("express-session");
-const PgSession = require("connect-pg-simple")(session);
-const { pool } = require("./config/db");
 
 // Import Helmet to add security headers to HTTP responses.
 const helmet = require("helmet");
@@ -37,8 +31,7 @@ app.use(cors({
     // Allow requests from this frontend origin.
     origin: process.env.FRONTEND_URL || "https://localhost:3000",
 
-    // Allow credentialed cross-origin requests, including session cookies.
-    credentials: true
+    // Clients authenticate with Authorization: Bearer tokens.
 }));
 
 // Convert incoming JSON request bodies into req.body.
@@ -52,48 +45,19 @@ app.get("/", (req, res) => {
   });
 });
 
-// Authentication routes
-app.use("/api/auth", authRoutes);
-
-// Handle 404 errors
-app.use((req, res) => {
-  res.status(404).json({
-    status: "error",
-    message: "Page not found",
-  });
-});
-// Configure session management for logged-in users.
-app.use(session({
-    // Set the name of the session cookie.
-    name: "sid",
-
-    store: new PgSession({
-        pool,
-        tableName: "user_sessions",
-        createTableIfMissing: false
-    }),
-    // Secret used to sign the session ID cookie.
-
-    secret: process.env.SESSION_SECRET,
-
-    resave: false,
-    saveUninitialized: false,
-
-    cookie: {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 1000 * 60 * 60
-    }
-}));
-
 // Connect authentication routes to URLs starting with /auth.
 app.use("/auth", authRouter);
+app.use("/api/auth", authRouter);
 
 // Connect user routes to URLs starting with /users.
 app.use("/users", usersRouter);
+app.use("/api/users", usersRouter);
 
 // Handle errors forwarded by routes and middleware.
 app.use(errorHandler);
+
+app.use((req, res) => {
+    res.status(404).json({ status: "error", message: "Page not found" });
+});
 
 module.exports = app;

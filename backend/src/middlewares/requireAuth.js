@@ -1,15 +1,23 @@
-const {findUserById} = require("../repositories/users.repository");
+const { prisma } = require("../config/prisma");
+const { verifyToken } = require("../lib/jwt");
 
 async function requireAuth(req, res, next) {
 
-    const userId = req.session?.userId;
-    try {
+    const authorization = req.get("Authorization") || "";
+    const [scheme, token, extra] = authorization.split(" ");
+    if (scheme !== "Bearer" || !token || extra) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
 
-        if (!userId)
-            return res.status(401).json({
-                error: "Unauthorized"
-            });
-        const user = await findUserById(userId);
+    let userId;
+    try {
+        ({ userId } = verifyToken(token));
+    } catch {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user)
         {
             return res.status(401).json({

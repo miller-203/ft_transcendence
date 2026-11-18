@@ -4,16 +4,13 @@ const {
     register,
     login,
     logout,
-    getCsrfToken
 } = require("../controllers/auth.controller");
 const { validateRegister } = require("../middlewares/validateRegistration");
 const {validateLogin} = require("../middlewares/validateLogin");
 const {loginLimiter} = require("../middlewares/loginLimiter");
-const {verifyCsrf} = require("../middlewares/verifyCsrf");
 
-authRouter.get("/csrf-token", getCsrfToken);
-authRouter.post("/register", verifyCsrf, validateRegister,register);
-authRouter.post("/login", loginLimiter, verifyCsrf, validateLogin,login);
-authRouter.post("/logout", verifyCsrf, logout);
+authRouter.post("/register", validateRegister, register);
+authRouter.post("/login", loginLimiter, validateLogin, login);
+authRouter.post("/logout", logout);
 
 module.exports = authRouter;

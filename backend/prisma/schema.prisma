@@ -7,8 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Add application models here, then create a migration with `npm run prisma:migrate`.
-
 enum UserType {
   STUDENT
   PROFESSOR
