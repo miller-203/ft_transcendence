@@ -1,35 +1,26 @@
+const { z } = require("zod");
+
+const registrationSchema = z.object({
+    firstName: z.string().min(5).max(100),
+    lastName: z.string().min(5).max(100),
+    email: z.string().email(),
+    password: z.string().min(8).z.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."),
+    status: z.enum(["ACTIVE", "BANNED"]),
+    type: z.enum(["STUDENT", "PROFESSOR"]),
+    role: z.enum(["USER", "ADMIN"])
+});
+
 function validateRegister(req, res, next)
 {
-    const {firstName, lastName, email, password, type, role} = req.body ?? {};
+    const {firstName, lastName, email, password, status, type, role} = req.body ?? {};
 
-    if (typeof firstName !== "string" || firstName.trim().length === 0 || typeof lastName !== "string" || lastName.trim().length === 0)
+    try {
+        registrationSchema.parse({firstName, lastName, email, password, status, type, role});
+    } catch (error) {
         return res.status(400).json({
-            error: "Invalid first or last name"
+            error: error.message
         });
-    if (typeof email !== "string" || !email.includes("@"))
-        return res.status(400).json({
-            error: "Invalid email"
-        });
-    if (firstName.length > 100 || lastName.length > 100)
-        return res.status(400).json({
-            error: "First or last name is too long"
-        });
-    if (email.length > 255)
-        return res.status(400).json({
-            error: "Email is too long"
-        });
-    if (typeof password !== "string" || password.length < 8)
-        return res.status(400).json({
-            error: "Invalid password, must be at least 8 characters"
-        });
-    if (typeof role !== "string" || !["USER", "ADMIN"].includes(role))
-        return res.status(400).json({
-            error: "Invalid role"
-        });
-    if (typeof type !== "string" || !["STUDENT", "PROFESSOR"].includes(type))
-        return res.status(400).json({
-            error: "Invalid type"
-        });
+    }
     return next();
 }
 

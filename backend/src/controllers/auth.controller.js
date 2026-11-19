@@ -2,10 +2,10 @@ const { registerUser, loginUser, getUserProfile} = require("../services/auth.ser
 const { signToken } = require("../lib/jwt");
 
 async function register(req, res, next) {
-    const { firstName, lastName, email, password, type, role } = req.body ?? {};
+    const { firstName, lastName, email, password, status, type, role } = req.body ?? {};
 
     try {
-        const user = await registerUser(firstName, lastName, email, password, type, role);
+        const user = await registerUser(firstName, lastName, email, password, status, type, role);
 
         return res.status(201).json({ user });
     }
@@ -29,6 +29,10 @@ async function login(req, res, next)
         if (user === undefined)
             return res.status(401).json({
                 error: "Unauthorized"
+            });
+        if (user.status === "BANNED")
+            return res.status(403).json({
+                error: "Forbidden"
             });
         return res.status(200).json({ user, token: signToken(user.id) });
     }

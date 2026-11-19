@@ -1,16 +1,16 @@
 const bcrypt = require("bcrypt");
 const { prisma } = require("../config/prisma");
 
-async function registerUser(firstName, lastName, email, password, type, role) {
+async function registerUser(firstName, lastName, email, password, status, type, role) {
 
     const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({
-        data: { firstName, lastName, email: email.toLowerCase(), password: passwordHash, type: type, role: role },
-        select: { id: true, firstName: true, lastName: true, email: true, type: true, role: true }
+        data: { firstName, lastName, email: email.toLowerCase(), password: passwordHash, status: status, type: type, role: role },
+        select: { id: true, firstName: true, lastName: true, email: true, status: true, type: true, role: true }
     });
 
-    return { id: user.id, name: `${user.firstName} ${user.lastName}`, email: user.email, type: user.type, role: user.role };
+    return { id: user.id, name: `${user.firstName} ${user.lastName}`, email: user.email, status: user.status, type: user.type, role: user.role };
 }
 
 async function loginUser(email, password) {
@@ -32,6 +32,7 @@ async function loginUser(email, password) {
         id: user.id,
         name: `${user.firstName} ${user.lastName}`,
         email: user.email,
+        status: user.status,
         role: user.role,
         type: user.type
     };
@@ -41,7 +42,7 @@ async function getUserProfile(userId)
 {
     const user = await prisma.user.findUnique({
         where: { id: Number(userId) },
-        select: { id: true, firstName: true, lastName: true, email: true, type: true, role: true, createdAt: true }
+        select: { id: true, firstName: true, lastName: true, email: true, status: true, type: true, role: true, createdAt: true }
     });
 
     return user ? { ...user, name: `${user.firstName} ${user.lastName}` } : undefined;

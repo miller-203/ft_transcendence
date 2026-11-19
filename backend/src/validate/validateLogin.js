@@ -1,22 +1,23 @@
+const { z } = require("zod");
+
+const loginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(8).z.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."),
+});
+
 function validateLogin(req, res, next)
 {
 
     const {email, password} = req.body ?? {};
 
-    if (typeof email !== "string" || !email.includes("@"))
+    try {
+        loginSchema.parse({email, password});
+    } catch (error) {
         return res.status(400).json({
-            error: "Invalid email"
-        });
-    if (email.length > 255) {
-        return res.status(400).json({
-            error: "email is too long"
+            error: error.message
         });
     }
-    if (typeof password !== "string" || password.length === 0)
-        return res.status(400).json({
-            error: "Invalid password"
-        });
     next();
 }
 
-module.exports = {validateLogin}
+module.exports = {validateLogin}        
