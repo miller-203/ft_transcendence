@@ -6,7 +6,7 @@ const registrationSchema = z.object({
     email: z.string().email(),
     password: z.string().min(8).z.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."),
     status: z.enum(["ACTIVE", "BANNED"]),
-    type: z.enum(["STUDENT", "PROFESSOR"]),
+    type: z.enum(["STUDENT", "TEACHER"]),
     role: z.enum(["USER", "ADMIN"])
 });
 
