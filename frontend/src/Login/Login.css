@@ -1,0 +1,38 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-page h1 {
+  color: #4C1D95;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 360px;
+  align-self: center;
+  margin-top: auto;
+  margin-bottom: auto;
+  border: 1px solid #4C1D95;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.login-container input {
+  padding: 10px;
+  border: 1px solid #4C1D95;
+  border-radius: 8px;
+}
+
+.login-container button {
+  background-color: #4C1D95;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+

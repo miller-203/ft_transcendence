@@ -1,0 +1,116 @@
+
+.register-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+section:first-child {
+  background-color: #4c1d95;
+  flex-direction: column;
+  gap: 15px;
+}
+
+section:last-child {
+  background-color: #faf9f5;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.register-container {
+  width: 80%;
+  max-width: 429px;
+}
+
+
+.form-header {
+  margin-bottom: 24px;
+}
+
+.Remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.Remember a {
+  margin-left: auto;
+  color: #4C1D95;
+  text-decoration: none;
+}
+
+.Remember a:hover {
+  text-decoration: underline;
+}
+
+.password-input-field {
+  position: relative;
+}
+
+.password-input-field input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.password-input-field button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: none;
+  
+}
+
+.last-child .form-header h2 {
+  font-size: 32px;
+  color: #111827;
+}
+
+.last-child .form-header p {
+  color: #6b7280;
+}
+
+.register-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.email-input,
+.password-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.email-input input,
+.password-input input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid gray;
+  padding-right: 60px;
+}
+
+.register-container form .sign-up, 
+.login {
+  background-color: #4c1d95;
+  color: white;
+  border-radius: 8px;
+  border: 1px solid #4c1d95;
+  padding: 14px;
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+
+
+.register-container form .sign-up:hover {
+  background-color: #3b0764;
+}
