@@ -1,23 +1,38 @@
-import express from "express";
+
+const express = require("express");
 
 const app = express();
 
-// Parse JSON request bodies
-app.use(express.json());
+if (process.env.TRUST_PROXY === "1") {
+    app.set("trust proxy", 1);
+}
+
+const helmet = require("helmet");
+const cors = require("cors");
+
+const authRouter = require("./routes/auth.routes");
+const usersRouter = require("./routes/users.routes");
+const { errorHandler } = require("./middlewares/errorHandler");
+
+app.use(helmet());
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL || "https://localhost:3000",
+}));
+
+app.use(express.json({ limit: "10kb" }));
 
 app.get("/", (req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "API is running",
-  });
+    res.status(200).json({ status: "success", message: "API is running" });
 });
 
-//Hundle 404 error status not found
+app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
+
+app.use(errorHandler);
+
 app.use((req, res) => {
-  res.status(404).json({
-    status: "error",
-    message: "Page not found",
-  });
+    res.status(404).json({ status: "error", message: "Page not found" });
 });
 
-export default app;
+module.exports = app;
