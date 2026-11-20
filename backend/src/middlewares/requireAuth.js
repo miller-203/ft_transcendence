@@ -17,15 +17,21 @@ async function requireAuth(req, res, next) {
     }
 
     try {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, status: true },
+        });
         if (!user)
         {
             return res.status(401).json({
-                error: "User Doesn't Exist"
+                error: "Unauthorized"
             });
         }
+        if (user.status === "BANNED") {
+            return res.status(403).json({ error: "Forbidden" });
+        }
         req.user = user;
-        next();
+        return next();
     }
     catch (error){
 

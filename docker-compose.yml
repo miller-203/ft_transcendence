@@ -10,7 +10,6 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -25,7 +24,6 @@ services:
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT:-8000}:8000"
-      - "5555:5555" 
     environment:
       PORT: 8000
       DATABASE_URL: postgresql://${POSTGRES_USER:-learnhub_user}:${POSTGRES_PASSWORD:-learnhub_dev_password}@postgres:5432/${POSTGRES_DB:-learnhub}?schema=public

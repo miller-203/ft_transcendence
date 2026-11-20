@@ -2,17 +2,14 @@ const { registerUser, loginUser, getUserProfile} = require("../services/auth.ser
 const { signToken } = require("../lib/jwt");
 
 async function register(req, res, next) {
-    const { firstName, lastName, email, password, status, type, role } = req.body ?? {};
-
     try {
-        const user = await registerUser(firstName, lastName, email, password, status, type, role);
-
-        return res.status(201).json({ user });
+        const user = await registerUser(req.body);
+        return res.status(201).json({ user, token: signToken(user.id) });
     }
     catch (error) {
         if (error.code === "P2002") {
             return res.status(409).json({
-                error: "Email already exists"
+                error: "Username or email already exists"
             });
         }
         return next(error);
@@ -21,10 +18,10 @@ async function register(req, res, next) {
 
 async function login(req, res, next)
 {
-    const { email, password } = req.body ?? {};
+    const { identifier, password } = req.body ?? {};
 
     try{
-        const user = await loginUser(email, password);
+        const user = await loginUser(identifier, password);
 
         if (user === undefined)
             return res.status(401).json({
@@ -69,9 +66,4 @@ async function getMe(req, res) {
     }
 }
 
-function logout(req, res) {
-    // JWTs are stateless. The client logs out by discarding its token.
-    return res.status(204).end();
-}
-
-module.exports = { register , login, getMe, logout };
+module.exports = { register, login, getMe };
