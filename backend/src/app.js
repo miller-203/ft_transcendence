@@ -12,6 +12,7 @@ const cors = require("cors");
 
 const authRouter = require("./routes/auth.routes");
 const usersRouter = require("./routes/users.routes");
+const adminRouter = require("./routes/admin.routes.js");
 const { errorHandler } = require("./middlewares/errorHandler");
 
 app.use(helmet());
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/admin", adminRouter);
 
 app.use(errorHandler);
 

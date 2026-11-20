@@ -36,3 +36,4 @@ model User {
   updatedAt DateTime  @updatedAt
 }
 
+
