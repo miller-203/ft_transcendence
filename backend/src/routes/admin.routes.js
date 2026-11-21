@@ -1,22 +1,12 @@
 const express = require("express");
+const { requireAuth, requireAdmin } = require("../middlewares/requireAuth");
+const { getOverview, getUsers, setUserStatus, removeUser } = require("../controllers/admin.controller");
+
 const adminRouter = express.Router();
-
-const {
-    banUsers,
-    unbanUsers,
-    deleteUsers,
-    deleteLessons,
-    changeLessonsVisible,
-    changeLessonsInvisible,
-    changeStatusUsers
-} = require("../controllers/admin.controller");
-
-adminRouter.post("/banned-users/:id", banUsers);
-adminRouter.post("/unban-users/:id", unbanUsers);
-adminRouter.post("/delete-users/:id", deleteUsers);
-adminRouter.post("/delete-lessons/:id", deleteLessons);
-adminRouter.post("/change-lessons-visible/:id", changeLessonsVisible);
-adminRouter.post("/change-lessons-invisible/:id", changeLessonsInvisible);
-adminRouter.post("/change-status-users/:id", changeStatusUsers);
+adminRouter.use(requireAuth, requireAdmin);
+adminRouter.get("/overview", getOverview);
+adminRouter.get("/users", getUsers);
+adminRouter.patch("/users/:id/status", setUserStatus);
+adminRouter.delete("/users/:id", removeUser);
 
 module.exports = adminRouter;

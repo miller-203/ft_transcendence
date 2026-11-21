@@ -19,7 +19,7 @@ async function requireAuth(req, res, next) {
     try {
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            select: { id: true, status: true },
+            select: { id: true, status: true, role: true },
         });
         if (!user)
         {
@@ -42,4 +42,11 @@ async function requireAuth(req, res, next) {
     }
 }
 
-module.exports = { requireAuth };
+function requireAdmin(req, res, next) {
+    if (req.user?.role !== "ADMIN") {
+        return res.status(403).json({ error: "Forbidden" });
+    }
+    return next();
+}
+
+module.exports = { requireAuth, requireAdmin };

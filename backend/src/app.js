@@ -17,9 +17,12 @@ const { errorHandler } = require("./middlewares/errorHandler");
 
 app.use(helmet());
 
-app.use(cors({
-    origin: process.env.FRONTEND_URL || "https://localhost:3000",
-}));
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173,https://localhost:3000")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+app.use(cors({ origin: allowedOrigins }));
 
 app.use(express.json({ limit: "10kb" }));
 

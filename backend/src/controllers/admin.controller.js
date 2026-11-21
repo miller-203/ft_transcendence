@@ -1,89 +1,69 @@
 const {
-    banUsersService,
-    unbanUsersService, 
-    deleteUsersService,
-    deleteLessonsService, 
-    changeLessonsVisibleService,
-    changeLessonsInvisibleService, 
-    changeStatusUsersService
+    getAdminOverview,
+    listUsers,
+    updateUserStatus,
+    deleteUser,
 } = require("../services/admin.service");
 
-async function banUsers(req, res, next) {
+function parseUserId(value) {
+    const id = Number(value);
+    return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
+async function getOverview(req, res, next) {
     try {
-        const { userIds } = req.body;
-        await banUsersService(userIds);
-        return res.status(200).json({ message: "Users banned successfully" });
+        return res.json(await getAdminOverview());
     } catch (error) {
         return next(error);
     }
 }
 
-async function unbanUsers(req, res, next) {
+async function getUsers(req, res, next) {
+    const { search = "", status, type } = req.query;
+    const page = Number(req.query.page ?? 1);
+    const pageSize = Number(req.query.pageSize ?? 10);
+    if (typeof search !== "string" || search.length > 100 ||
+        (status && !["ACTIVE", "BANNED"].includes(status)) ||
+        (type && !["STUDENT", "TEACHER"].includes(type)) ||
+        !Number.isSafeInteger(page) || page < 1 ||
+        !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+        return res.status(400).json({ error: "Invalid query parameters" });
+    }
     try {
-        const { userIds } = req.body;
-        await unbanUsersService(userIds);
-        return res.status(200).json({ message: "Users unbanned successfully" });
+        return res.json(await listUsers({ search: search.trim(), status, type, page, pageSize }));
     } catch (error) {
         return next(error);
     }
 }
 
-async function deleteUsers(req, res, next) {
+async function setUserStatus(req, res, next) {
+    const userId = parseUserId(req.params.id);
+    if (!userId) return res.status(400).json({ error: "Invalid user id" });
+    if (userId === req.user.id) return res.status(400).json({ error: "You cannot change your own account status" });
+    const { status } = req.body ?? {};
+    if (!["ACTIVE", "BANNED"].includes(status)) {
+        return res.status(400).json({ error: "Status must be ACTIVE or BANNED" });
+    }
     try {
-        const { userIds } = req.body;
-        await deleteUsersService(userIds);
-        return res.status(200).json({ message: "Users deleted successfully" });
+        const result = await updateUserStatus(userId, status);
+        if (!result.count) return res.status(404).json({ error: "User not found or cannot be managed" });
+        return res.json({ message: `User ${status === "BANNED" ? "banned" : "unbanned"}` });
     } catch (error) {
         return next(error);
     }
 }
 
-async function deleteLessons(req, res, next) {
+async function removeUser(req, res, next) {
+    const userId = parseUserId(req.params.id);
+    if (!userId) return res.status(400).json({ error: "Invalid user id" });
+    if (userId === req.user.id) return res.status(400).json({ error: "You cannot delete your own account" });
     try {
-        const { lessonIds } = req.body;
-        await deleteLessonsService(lessonIds);
-        return res.status(200).json({ message: "Lessons deleted successfully" });
+        const result = await deleteUser(userId);
+        if (!result.count) return res.status(404).json({ error: "User not found or cannot be managed" });
+        return res.json({ message: "User deleted" });
     } catch (error) {
         return next(error);
     }
 }
 
-async function changeLessonsVisible(req, res, next) {
-    try {
-        const { lessonIds } = req.body;
-        await changeLessonsVisibleService(lessonIds);
-        return res.status(200).json({ message: "Lessons visibility changed to visible successfully" });
-    } catch (error) {
-        return next(error);
-    }
-}
-
-async function changeLessonsInvisible(req, res, next) {
-    try {
-        const { lessonIds } = req.body;
-        await changeLessonsInvisibleService(lessonIds);
-        return res.status(200).json({ message: "Lessons visibility changed to invisible successfully" });
-    } catch (error) {
-        return next(error);
-    }
-}
-
-async function changeStatusUsers(req, res, next) {
-    try {
-        const { userIds, status } = req.body;
-        await changeStatusUsersService(userIds, status);
-        return res.status(200).json({ message: "Users status changed successfully" });
-    } catch (error) {
-        return next(error);
-    }
-}
-
-module.exports = {
-    banUsers,
-    unbanUsers,
-    deleteUsers,
-    deleteLessons,
-    changeLessonsVisible,
-    changeLessonsInvisible,
-    changeStatusUsers
-};
+module.exports = { getOverview, getUsers, setUserStatus, removeUser };
